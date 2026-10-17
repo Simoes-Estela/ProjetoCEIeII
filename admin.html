@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sistema para Apoio à Aprendizagem de Python - Painel Administrativo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+    <!-- Navegação -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary mb-4 shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Sistema para Apoio à Aprendizagem de Python [Admin]</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="main.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="Banco-de-Questões.html">Banco de Questões</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="Admin.html">Painel Admin</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Conteúdo Principal -->
+    <div class="container mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Gerenciamento de Questões</h2>
+            <button class="btn btn-success" onclick="abrirModalCriacao()">➕ Nova Questão</button>
+        </div>
+
+        <!-- Tabela de Questões -->
+        <div class="card shadow-sm p-3">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Matéria</th>
+                            <th>Título</th>
+                            <th>Tipo</th>
+                            <th>Dificuldade</th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaQuestoes">
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">Carregando questões...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Cadastro / Edição -->
+    <div class="modal fade" id="modalQuestao" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitulo">Cadastrar Nova Questão</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formAdminQuestao">
+                        <input type="hidden" id="questaoId">
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <label for="materia" class="form-label">Matéria</label>
+                                <select id="materia" class="form-select" required>
+                                    <option value="CE I">CE I</option>
+                                    <option value="CE II">CE II</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="tipo" class="form-label">Tipo</label>
+                                <select id="tipo" class="form-select" required>
+                                    <option value="Objetiva">Objetiva</option>
+                                    <option value="Preencher Lacuna">Preencher Lacuna</option>
+                                    <option value="Código">Código</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="dificuldade" class="form-label">Dificuldade</label>
+                                <select id="dificuldade" class="form-select" required>
+                                    <option value="Fácil">Fácil</option>
+                                    <option value="Médio">Médio</option>
+                                    <option value="Difícil">Difícil</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="titulo" class="form-label">Título da Questão</label>
+                            <input type="text" id="titulo" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="descricao" class="form-label">Enunciado / Descrição</label>
+                            <textarea id="descricao" class="form-control" rows="3" required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="gabarito" class="form-label">Gabarito (Resposta Esperada)</label>
+                            <input type="text" id="gabarito" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="codigo_suporte" class="form-label">Código de Suporte / Dataset (Opcional)</label>
+                            <textarea id="codigo_suporte" class="form-control" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="arquivo" class="form-label">Alterar / Anexar Arquivo (Opcional)</label>
+                            <input class="form-control" type="file" id="arquivo" accept=".pdf,.png,.jpg,.jpeg,.csv,.txt,.zip">
+                        </div>
+
+                        <div class="modal-footer px-0 pb-0">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" id="btnSalvarModal" class="btn btn-primary">Salvar Questão</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SDK do Supabase e Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const SUPABASE_URL = 'https://rlcfttmkcnqpwzfrsimz.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsY2Z0dG1rY25xcHd6ZnJzaW16Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyOTU1NDMsImV4cCI6MjEwNTg3MTU0M30.wZoLzN8o12lCAU1te69Uc4W732dM30LG5OAjdBOGydo';
+
+        const meuSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let meuModal;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            meuModal = new bootstrap.Modal(document.getElementById('modalQuestao'));
+            carregarTabelaAdmin();
+        });
+
+        // 1. Carrega todas as questões na tabela do Admin
+        async function carregarTabelaAdmin() {
+            const tbody = document.getElementById('tabelaQuestoes');
+            
+            try {
+                const { data: questoes, error } = await meuSupabase
+                    .from('questoes')
+                    .select('*')
+                    .order('id', { ascending: false });
+
+                if (error) throw error;
+
+                if (!questoes || questoes.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">Nenhuma questão cadastrada.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = questoes.map(q => `
+                    <tr>
+                        <td><strong>#${q.id}</strong></td>
+                        <td><span class="badge bg-secondary">${q.materia}</span></td>
+                        <td>${q.titulo}</td>
+                        <td>${q.tipo}</td>
+                        <td>${q.dificuldade}</td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-outline-primary me-1" onclick="abrirModalEdicao(${q.id})">✏️ Editar</button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="excluirQuestao(${q.id})">🗑️ Excluir</button>
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4">Erro ao carregar dados.</td></tr>`;
+            }
+        }
+
+        // 2. Abre o Modal para Criar Nova Questão
+        function abrirModalCriacao() {
+            document.getElementById('formAdminQuestao').reset();
+            document.getElementById('questaoId').value = '';
+            document.getElementById('modalTitulo').textContent = 'Cadastrar Nova Questão';
+            meuModal.show();
+        }
+
+        // 3. Abre o Modal preenchido para Editar Questão
+        async function abrirModalEdicao(id) {
+            try {
+                const { data: q, error } = await meuSupabase
+                    .from('questoes')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+
+                if (error) throw error;
+
+                document.getElementById('questaoId').value = q.id;
+                document.getElementById('materia').value = q.materia;
+                document.getElementById('tipo').value = q.tipo;
+                document.getElementById('dificuldade').value = q.dificuldade;
+                document.getElementById('titulo').value = q.titulo;
+                document.getElementById('descricao').value = q.descricao;
+                document.getElementById('gabarito').value = q.gabarito;
+                document.getElementById('codigo_suporte').value = q.codigo_suporte || '';
+                document.getElementById('arquivo').value = ''; // Limpa input file
+
+                document.getElementById('modalTitulo').textContent = `Editar Questão #${q.id}`;
+                meuModal.show();
+
+            } catch (err) {
+                console.error(err);
+                alert('Erro ao buscar dados da questão para edição.');
+            }
+        }
+
+        // 4. Salvar (Insere se novo ID vazio, ou Atualiza se ID preenchido)
+        document.getElementById('formAdminQuestao').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('questaoId').value;
+            const btn = document.getElementById('btnSalvarModal');
+            btn.textContent = 'Salvando...';
+            btn.disabled = true;
+
+            try {
+                let urlDoArquivo = undefined;
+                const campoArquivo = document.getElementById('arquivo');
+
+                // Faz upload do arquivo novo se selecionado
+                if (campoArquivo.files.length > 0) {
+                    const arquivo = campoArquivo.files[0];
+                    const extensao = arquivo.name.split('.').pop();
+                    const nomeArquivoUnico = `${Date.now()}.${extensao}`;
+
+                    const { error: uploadError } = await meuSupabase
+                        .storage
+                        .from('arquivos_questoes')
+                        .upload(nomeArquivoUnico, arquivo);
+
+                    if (uploadError) throw new Error(`Erro no upload: ${uploadError.message}`);
+
+                    const { data: urlData } = meuSupabase
+                        .storage
+                        .from('arquivos_questoes')
+                        .getPublicUrl(nomeArquivoUnico);
+
+                    urlDoArquivo = urlData.publicUrl;
+                }
+
+                const dadosQuestao = {
+                    materia: document.getElementById('materia').value,
+                    tipo: document.getElementById('tipo').value,
+                    dificuldade: document.getElementById('dificuldade').value,
+                    titulo: document.getElementById('titulo').value,
+                    descricao: document.getElementById('descricao').value,
+                    gabarito: document.getElementById('gabarito').value,
+                    codigo_suporte: document.getElementById('codigo_suporte').value || null
+                };
+
+                if (urlDoArquivo !== undefined) {
+                    dadosQuestao.arquivo_url = urlDoArquivo;
+                }
+
+                if (id) {
+                    // Atualização (UPDATE)
+                    const { error } = await meuSupabase
+                        .from('questoes')
+                        .update(dadosQuestao)
+                        .eq('id', id);
+
+                    if (error) throw error;
+                    alert('✅ Questão atualizada com sucesso!');
+                } else {
+                    // Inserção (INSERT)
+                    const { error } = await meuSupabase
+                        .from('questoes')
+                        .insert([dadosQuestao]);
+
+                    if (error) throw error;
+                    alert('✅ Questão cadastrada com sucesso!');
+                }
+
+                meuModal.hide();
+                carregarTabelaAdmin();
+
+            } catch (err) {
+                console.error(err);
+                alert(`❌ Erro ao salvar: ${err.message}`);
+            } finally {
+                btn.textContent = 'Salvar Questão';
+                btn.disabled = false;
+            }
+        });
+
+        // 5. Excluir Questão
+        async function excluirQuestao(id) {
+            if (!confirm(`Tem certeza que deseja excluir a questão #${id}?`)) return;
+
+            try {
+                const { error } = await meuSupabase
+                    .from('questoes')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                alert('🗑️ Questão excluída com sucesso!');
+                carregarTabelaAdmin();
+
+            } catch (err) {
+                console.error(err);
+                alert(`❌ Erro ao excluir: ${err.message}`);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sistema para Apoio à Aprendizagem de Python- Visualizar Questão</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+    <!-- Navegação -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary mb-4 shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Sistema para Apoio à Aprendizagem de Python em Computação para Engenharia</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="main.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="Banco-de-Questões.html">← Voltar ao Banco de Questões</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Container Principal da Questão -->
+    <div class="container mb-5" style="max-width: 850px;">
+        
+        <!-- Indicador de Carregamento -->
+        <div id="carregando" class="text-center my-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Carregando questão...</span>
+            </div>
+            <p class="mt-2 text-muted">Carregando detalhes da questão...</p>
+        </div>
+
+        <!-- Área dos Detalhes da Questão -->
+        <div id="conteudoQuestao" class="d-none">
+            <div class="card shadow-sm p-4 mb-4">
+                
+                <!-- Tags de Categoria -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <span id="badgeMateria" class="badge bg-primary fs-6 me-2"></span>
+                        <span id="badgeTipo" class="badge bg-secondary fs-6"></span>
+                    </div>
+                    <span id="badgeDificuldade" class="badge fs-6"></span>
+                </div>
+
+                <!-- Título e Enunciado -->
+                <h2 id="tituloQuestao" class="mb-3"></h2>
+                <div class="mb-4">
+                    <h5 class="text-muted">Enunciado:</h5>
+                    <p id="descricaoQuestao" class="fs-5" style="white-space: pre-line;"></p>
+                </div>
+
+                <!-- Botão de Download do Arquivo Anexo (Se houver) -->
+                <div id="blocoArquivo" class="mb-4 d-none">
+                    <a id="btnDownloadArquivo" href="#" target="_blank" class="btn btn-outline-info">
+                        📎 Baixar Arquivo Anexo / Material de Apoio
+                    </a>
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Botão para Revelar Resposta e Código de Apoio -->
+                <div class="text-center">
+                    <button id="btnRevelar" class="btn btn-primary btn-lg w-100">
+                        Mostrar Resposta e Código de Apoio
+                    </button>
+                </div>
+
+                <!-- Bloco Oculto com Código de Suporte e Gabarito -->
+                <div id="blocoOculto" class="mt-4 d-none">
+                    
+                    <!-- Bloco de Código de Suporte (Exibido apenas se existir na questão) -->
+                    <div id="blocoCodigo" class="mb-4 d-none">
+                        <h6 class="fw-bold">Código / Dataset de Apoio:</h6>
+                        <pre class="bg-dark text-light p-3 rounded"><code><span id="codigoSuporte"></span></code></pre>
+                    </div>
+
+                    <!-- Bloco da Resposta / Gabarito -->
+                    <div class="alert alert-success border-success">
+                        <h5 class="alert-heading fw-bold mb-2">💡 Resposta / Gabarito Oficial:</h5>
+                        <p id="gabaritoOficial" class="mb-0 fs-5" style="white-space: pre-line;"></p>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SDK do Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        const SUPABASE_URL = 'https://rlcfttmkcnqpwzfrsimz.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsY2Z0dG1rY25xcHd6ZnJzaW16Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyOTU1NDMsImV4cCI6MjEwNTg3MTU0M30.wZoLzN8o12lCAU1te69Uc4W732dM30LG5OAjdBOGydo';
+
+        const meuSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function carregarDetalhesQuestao() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const questaoId = urlParams.get('id');
+
+            if (!questaoId) {
+                document.getElementById('carregando').innerHTML = '<div class="alert alert-danger">Nenhuma questão especificada. Volte ao Banco de Questões.</div>';
+                return;
+            }
+
+            try {
+                const { data: questao, error } = await meuSupabase
+                    .from('questoes')
+                    .select('*')
+                    .eq('id', questaoId)
+                    .single();
+
+                if (error || !questao) {
+                    throw new Error('Questão não encontrada no banco de dados.');
+                }
+
+                // Preenche os dados na tela
+                document.getElementById('tituloQuestao').textContent = questao.titulo;
+                document.getElementById('descricaoQuestao').textContent = questao.descricao;
+                document.getElementById('badgeMateria').textContent = questao.materia;
+                document.getElementById('badgeTipo').textContent = questao.tipo;
+                document.getElementById('gabaritoOficial').textContent = questao.gabarito;
+                
+                // Configura a tag de dificuldade
+                const badgeDif = document.getElementById('badgeDificuldade');
+                badgeDif.textContent = questao.dificuldade;
+                if (questao.dificuldade === 'Fácil') badgeDif.className = 'badge bg-success fs-6';
+                else if (questao.dificuldade === 'Médio') badgeDif.className = 'badge bg-warning text-dark fs-6';
+                else badgeDif.className = 'badge bg-danger fs-6';
+
+                // Prepara o código de suporte (se houver)
+                if (questao.codigo_suporte && questao.codigo_suporte.trim() !== "") {
+                    document.getElementById('codigoSuporte').textContent = questao.codigo_suporte;
+                    document.getElementById('blocoCodigo').classList.remove('d-none');
+                }
+
+                // Prepara o link do arquivo anexo (se houver)
+                if (questao.arquivo_url) {
+                    document.getElementById('btnDownloadArquivo').href = questao.arquivo_url;
+                    document.getElementById('blocoArquivo').classList.remove('d-none');
+                }
+
+                // Exibe o conteúdo principal
+                document.getElementById('carregando').classList.add('d-none');
+                document.getElementById('conteudoQuestao').classList.remove('d-none');
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('carregando').innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+            }
+        }
+
+        // Lógica do botão de alternar (mostrar/ocultar resposta e código)
+        document.getElementById('btnRevelar').addEventListener('click', () => {
+            const blocoOculto = document.getElementById('blocoOculto');
+            const btn = document.getElementById('btnRevelar');
+
+            if (blocoOculto.classList.contains('d-none')) {
+                blocoOculto.classList.remove('d-none');
+                btn.textContent = 'Mostrar Resposta e possível solução';
+                btn.className = 'btn btn-outline-secondary btn-lg w-100';
+            } else {
+                blocoOculto.classList.add('d-none');
+                btn.textContent = 'Mostrar Resposta e possível solução';
+                btn.className = 'btn btn-primary btn-lg w-100';
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', carregarDetalhesQuestao);
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

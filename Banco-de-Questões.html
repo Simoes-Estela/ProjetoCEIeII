@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sistema para Apoio à Aprendizagem de Python - Banco de Questões</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .descricao-limitada {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+    <!-- Navegação -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary mb-4 shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Sistema para Apoio à Aprendizagem de Python</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="main.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="Banco-de-Questões.html">Banco de Questões</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Container dos Cards -->
+    <div class="container">
+        <h2 class="mb-4">Questões Disponíveis</h2>
+        
+        <div id="listaQuestoes" class="row g-4">
+            <div class="col-12 text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Carregando...</span>
+                </div>
+                <p class="mt-2">Buscando questões no banco de dados...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Importação do SDK do Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Script de Busca -->
+    <script>
+        const SUPABASE_URL = 'https://rlcfttmkcnqpwzfrsimz.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsY2Z0dG1rY25xcHd6ZnJzaW16Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyOTU1NDMsImV4cCI6MjEwNTg3MTU0M30.wZoLzN8o12lCAU1te69Uc4W732dM30LG5OAjdBOGydo';
+
+        // Mudamos o nome da variável para 'meuSupabase' para evitar conflitos!
+        const meuSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function carregarQuestoes() {
+            const container = document.getElementById('listaQuestoes');
+            
+            try {
+                // Usando a variável renomeada
+                const { data: questoes, error } = await meuSupabase
+                    .from('questoes')
+                    .select('*')
+                    .order('id', { ascending: false });
+
+                if (error) {
+                    throw error;
+                }
+
+                if (!questoes || questoes.length === 0) {
+                    container.innerHTML = '<div class="col-12"><div class="alert alert-info">Ainda não há questões cadastradas.</div></div>';
+                    return;
+                }
+
+                container.innerHTML = '';
+
+                questoes.forEach(q => {
+                    const imagemPadrao = "https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+
+                    let corDificuldade = 'text-success';
+                    if (q.dificuldade === 'Médio') corDificuldade = 'text-warning';
+                    if (q.dificuldade === 'Difícil') corDificuldade = 'text-danger';
+
+                    const cardHTML = `
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <div class="card h-100 shadow-sm">
+                                <img src="${imagemPadrao}" class="card-img-top" alt="Capa da questão" style="height: 160px; object-fit: cover;">
+                                <div class="card-body">
+                                    <h5 class="card-title text-truncate" title="${q.titulo}">${q.titulo}</h5>
+                                    <p class="card-text text-muted descricao-limitada">${q.descricao}</p>
+                                </div>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item"><strong>Matéria:</strong> ${q.materia}</li>
+                                    <li class="list-group-item"><strong>Nível:</strong> <span class="fw-bold ${corDificuldade}">${q.dificuldade}</span></li>
+                                    <li class="list-group-item"><strong>Tipo:</strong> ${q.tipo}</li>
+                                </ul>
+                                <div class="card-body bg-light border-top text-center">
+                                    <a href="Questao.html?id=${q.id}" class="btn btn-primary w-100">Resolver Questão</a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    container.innerHTML += cardHTML;
+                });
+
+            } catch (error) {
+                console.error("Erro ao buscar dados:", error);
+                container.innerHTML = `<div class="col-12"><div class="alert alert-danger">Erro ao carregar as questões: ${error.message}</div></div>`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', carregarQuestoes);
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

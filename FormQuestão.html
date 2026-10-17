@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>EngProg-Academy - Cadastrar Questão</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<!-- Navegação -->
+<nav class="navbar navbar-expand-lg bg-body-tertiary mb-4">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Sistema para Apoio à Aprendizagem de Python/a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="main.html">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="Banco-de-Questões.html">Banco de Questões</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Formulário de Cadastro -->
+<div class="container">
+    <div class="card shadow-sm p-4 mx-auto" style="max-width: 700px;">
+        <h3 class="card-title mb-3"> Cadastrar Nova Questão</h3>
+        
+        <form id="formQuestao">
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <label for="materia" class="form-label">Matéria</label>
+                    <select id="materia" class="form-select" required>
+                        <option value="CE I">CE I</option>
+                        <option value="CE II">CE II</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="tipo" class="form-label">Tipo</label>
+                    <select id="tipo" class="form-select" required>
+                        <option value="Objetiva">Objetiva</option>
+                        <option value="Preencher Lacuna">Preencher Lacuna</option>
+                        <option value="Código">Código</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="dificuldade" class="form-label">Dificuldade</label>
+                    <select id="dificuldade" class="form-select" required>
+                        <option value="Fácil">Fácil</option>
+                        <option value="Médio">Médio</option>
+                        <option value="Difícil">Difícil</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="titulo" class="form-label">Título da Questão</label>
+                <input type="text" id="titulo" class="form-control" placeholder="Ex: Matriz de Adjacência em Python" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="descricao" class="form-label">Enunciado / Descrição</label>
+                <textarea id="descricao" class="form-control" rows="3" placeholder="Escreva aqui o enunciado da questão..." required></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label for="gabarito" class="form-label">Gabarito (Resposta Esperada)</label>
+                <input type="text" id="gabarito" class="form-control" placeholder="Ex: Alternativa B ou [1, 2, 3]" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="codigo_suporte" class="form-label">Código de Suporte / Dataset (Opcional)</label>
+                <textarea id="codigo_suporte" class="form-control" rows="3" placeholder="# Código Python inicial se houver..."></textarea>
+            </div>
+
+            <div class="mb-4">
+                <label for="arquivo" class="form-label">Anexar Arquivo (Opcional)</label>
+                <input class="form-control" type="file" id="arquivo" accept=".pdf,.png,.jpg,.jpeg,.csv,.txt,.zip">
+                <div class="form-text">Envie datasets, imagens ou diagramas úteis para a resolução.</div>
+            </div>
+
+            <button type="submit" id="btnSalvar" class="btn btn-success w-100">Salvar no Banco de Dados</button>
+        </form>
+    </div>
+</div>
+
+<!-- Importação ÚNICA do SDK do Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+    console.log("1. Script inicializado...");
+
+    if (typeof window.supabase === 'undefined') {
+        alert("❌ Erro grave: A biblioteca do Supabase não carregou. Verifique sua conexão com a internet ou firewall.");
+    } else {
+        console.log("2. Supabase carregado com sucesso!");
+
+        const SUPABASE_URL = 'https://rlcfttmkcnqpwzfrsimz.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsY2Z0dG1rY25xcHd6ZnJzaW16Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyOTU1NDMsImV4cCI6MjEwNTg3MTU0M30.wZoLzN8o12lCAU1te69Uc4W732dM30LG5OAjdBOGydo';
+
+        // Unificado para meuSupabase para evitar conflitos de escopo
+        const meuSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        document.getElementById('formQuestao').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const btn = document.getElementById('btnSalvar');
+            btn.innerHTML = 'Salvando... aguarde';
+            btn.disabled = true;
+
+            try {
+                let urlDoArquivo = null;
+                const campoArquivo = document.getElementById('arquivo');
+
+                // 1. Upload do arquivo para o bucket 'arquivos_questoes' (se houver arquivo selecionado)
+                if (campoArquivo.files.length > 0) {
+                    const arquivo = campoArquivo.files[0];
+                    const extensao = arquivo.name.split('.').pop();
+                    const nomeArquivoUnico = `${Date.now()}.${extensao}`;
+
+                    const { data: uploadData, error: uploadError } = await meuSupabase
+                        .storage
+                        .from('arquivos_questoes')
+                        .upload(nomeArquivoUnico, arquivo);
+
+                    if (uploadError) throw new Error(`Erro no upload do arquivo: ${uploadError.message}`);
+
+                    const { data: urlData } = meuSupabase
+                        .storage
+                        .from('arquivos_questoes')
+                        .getPublicUrl(nomeArquivoUnico);
+
+                    urlDoArquivo = urlData.publicUrl;
+                }
+
+                // 2. Monta o objeto com os dados do formulário
+                const novaQuestao = {
+                    materia: document.getElementById('materia').value,
+                    tipo: document.getElementById('tipo').value,
+                    dificuldade: document.getElementById('dificuldade').value,
+                    titulo: document.getElementById('titulo').value,
+                    descricao: document.getElementById('descricao').value,
+                    gabarito: document.getElementById('gabarito').value,
+                    codigo_suporte: document.getElementById('codigo_suporte').value || null,
+                    arquivo_url: urlDoArquivo
+                };
+
+                // 3. Salva os dados na tabela 'questoes'
+                const { data, error } = await meuSupabase
+                    .from('questoes')
+                    .insert([novaQuestao]);
+
+                if (error) throw new Error(`Erro no banco: ${error.message}`);
+                
+                alert('Questão gravada com sucesso!');
+                document.getElementById('formQuestao').reset();
+
+            } catch (err) {
+                console.error('Erro geral:', err);
+                alert(`Ocorreu um erro: ${err.message}`);
+            } finally {
+                btn.innerHTML = 'Salvar no Banco de Dados';
+                btn.disabled = false;
+            }
+        });
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

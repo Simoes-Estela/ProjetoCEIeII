@@ -1,2 +1,1 @@
-# ProjetoCEIeII
-Repositório para o projeto desenvolvido durante minhas monitória para os alunos de programação para engenharia I e II
+Projeto de monitoria para o ensino de python das materias de Programação para engenharia I e II
