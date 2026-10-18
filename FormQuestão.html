@@ -16,14 +16,12 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="main.html">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="Banco-de-Questões.html">Banco de Questões</a>
-                </li>
-            </ul>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Início</a></li>
+                    <li class="nav-item"><a class="nav-link" href="Banco-de-Questões.html">Banco de Questões</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="VisualizacaoListas.html">Simulador de Listas</a></li>
+                    <li class="nav-item"><a class="nav-link" href="admin.html">Painel Admin</a></li>
+                </ul>
         </div>
     </div>
 </nav>
@@ -98,7 +96,7 @@
     console.log("1. Script inicializado...");
 
     if (typeof window.supabase === 'undefined') {
-        alert("❌ Erro grave: A biblioteca do Supabase não carregou. Verifique sua conexão com a internet ou firewall.");
+        alert(" Erro grave: A biblioteca do Supabase não carregou. Verifique sua conexão com a internet ou firewall.");
     } else {
         console.log("2. Supabase carregado com sucesso!");
 

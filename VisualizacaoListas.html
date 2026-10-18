@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sistema para Apoio à Aprendizagem de Python - Simulação de Listas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="StyleVisualizaçãoLIsta">
+</head>
+<body class="bg-light">
+
+    <!-- Barra de Navegação -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary shadow-sm mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold text-primary" href="index.html">
+                Sistema para Apoio à Aprendizagem de Python <span class="text-muted fs-6 fw-normal d-none d-lg-inline">| Sistema para Apoio à Aprendizagem de Python</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                 <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Início</a></li>
+                    <li class="nav-item"><a class="nav-link" href="Banco-de-Questões.html">Banco de Questões</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="VisualizacaoListas.html">Simulador de Listas</a></li>
+                    <li class="nav-item"><a class="nav-link" href="admin.html">Painel Admin</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-4">
+        <h2 class="fw-bold text-primary mb-1">Simulador Visual de Listas em Python</h2>
+        <p class="text-muted mb-4">Aprenda na prática como os métodos <code>append()</code>, <code>extend()</code> e <code>insert()</code> alteram a estrutura de uma lista.</p>
+
+        <div class="row g-4">
+            <!-- Coluna da Esquerda: Controles e Código -->
+            <div class="col-lg-5">
+                <!-- Card 1: Criar Lista Inicial -->
+                <div class="card shadow-sm mb-3">
+                    <div class="card-header bg-white fw-bold">1. Criar Lista Inicial</div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="tamanhoInicial" class="form-label">Tamanho inicial da lista:</label>
+                            <input type="number" id="tamanhoInicial" class="form-control" min="1" max="10" value="4">
+                        </div>
+                        <button class="btn btn-primary w-100" onclick="criarLista()">Criar Lista</button>
+                    </div>
+                </div>
+
+                <!-- Card 2: Operações na Lista -->
+                <div class="card shadow-sm mb-3">
+                    <div class="card-header bg-white fw-bold">2. Operações em Python</div>
+                    <div class="card-body d-flex flex-column gap-3">
+                        
+                        <!-- Inserir no Fim (append) -->
+                        <div>
+                            <label class="form-label fw-semibold mb-1">Adicionar no fim (.append):</label>
+                            <div class="input-group">
+                                <input type="text" id="valorAppend" class="form-control" placeholder="Valor (ex: 99)">
+                                <button class="btn btn-outline-primary" onclick="executarAppend()">Append</button>
+                            </div>
+                        </div>
+
+                        <hr class="my-1">
+
+                        <!-- Inserir em Posição Específica (insert) -->
+                        <div>
+                            <label class="form-label fw-semibold mb-1">Inserir em índice específico (.insert):</label>
+                            <div class="row g-2">
+                                <div class="col-4">
+                                    <input type="number" id="indiceInsert" class="form-control" placeholder="Índice" min="0">
+                                </div>
+                                <div class="col-8">
+                                    <div class="input-group">
+                                        <input type="text" id="valorInsert" class="form-control" placeholder="Valor">
+                                        <button class="btn btn-outline-warning text-dark" onclick="executarInsert()">Insert</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-1">
+
+                        <!-- Estender Múltiplos (extend) -->
+                        <div>
+                            <label class="form-label fw-semibold mb-1">Adicionar vários elementos (.extend):</label>
+                            <div class="input-group">
+                                <input type="text" id="valoresExtend" class="form-control" placeholder="Ex: 5, 8, 12">
+                                <button class="btn btn-outline-success" onclick="executarExtend()">Extend</button>
+                            </div>
+                            <small class="text-muted">Separe os valores por vírgula.</small>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Card 3: Terminal / Código Python -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-dark text-white fw-bold">Terminal / Código Executado</div>
+                    <div class="card-body painel-codigo" id="painelCodigo">
+                        <p class="linha-codigo" style="color: #6a9955;"># O código Python gerado aparecerá aqui</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coluna da Direita: Visualização Gráfica -->
+            <div class="col-lg-7">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-white fw-bold">Visualização Gráfica da Memória</div>
+                    <div class="card-body text-center d-flex flex-column align-items-center justify-content-center">
+                        
+                        <div class="mb-4">
+                            <span class="fs-5 fw-semibold text-secondary">minha_lista = </span>
+                            <span id="textoListaEmCodigo" class="fs-4 fw-bold text-dark">[ ]</span>
+                        </div>
+
+                        <!-- Container dos Elementos Visuais -->
+                        <div id="containerListaVisual" class="d-flex flex-wrap justify-content-center gap-4 py-4 mb-4">
+                            <p class="text-muted">Clique em "Criar Lista" para começar.</p>
+                        </div>
+
+                        <div class="alert alert-info w-100 text-start mt-auto mb-0 small">
+                            💡 <strong>Resumo dos Métodos:</strong>
+                            <ul class="mb-0 ps-3">
+                                <li><code>append(valor)</code>: Adiciona o elemento ao <strong>final</strong> da lista adicionando um novo índice.</li>
+                                <li><code>insert(indice, valor)</code>: Insere o elemento na <strong>posição exata</strong> informada.</li>
+                                <li><code>extend([v1, v2])</code>: Adiciona vários elementos individualmente no <strong>final da lista adicionando um novo índice</strong>.</li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let minhaLista = [];
+        let historicoCodigo = [];
+
+        function atualizarInterface() {
+            const container = document.getElementById('containerListaVisual');
+            const textoCodigo = document.getElementById('textoListaEmCodigo');
+            const painelCodigo = document.getElementById('painelCodigo');
+
+            // Atualiza representação textual
+            textoCodigo.textContent = JSON.stringify(minhaLista).replace(/"/g, "'");
+
+            // Atualiza blocos gráficos
+            container.innerHTML = '';
+            if (minhaLista.length === 0) {
+                container.innerHTML = '<p class="text-muted">A lista está vazia.</p>';
+            } else {
+                minhaLista.forEach((item, index) => {
+                    const bloco = document.createElement('div');
+                    bloco.className = 'bloco-item shadow-sm';
+                    bloco.innerHTML = `
+                        ${item}
+                        <span class="bloco-indice">[${index}]</span>
+                    `;
+                    container.appendChild(bloco);
+                });
+            }
+
+            // Atualiza painel de código
+            painelCodigo.innerHTML = historicoCodigo.map(linha => `<p class="linha-codigo">${linha}</p>`).join('');
+        }
+
+        function criarLista() {
+            const tamanho = parseInt(document.getElementById('tamanhoInicial').value) || 0;
+            if (tamanho <= 0) return alert('Por favor, insira um tamanho válido!');
+
+            minhaLista = Array(tamanho).fill(0);
+            
+            historicoCodigo = [
+                `<span style="color: #6a9955;"># Criando lista inicial com ${tamanho} elementos</span>`,
+                `<span style="color: #569cd6;">minha_lista</span> = ${JSON.stringify(minhaLista)}`
+            ];
+
+            atualizarInterface();
+        }
+
+        function executarAppend() {
+            const input = document.getElementById('valorAppend');
+            let valor = input.value.trim();
+            if (valor === '') return alert('Digite um valor para inserir!');
+
+            if (!isNaN(valor)) valor = Number(valor);
+            minhaLista.push(valor);
+
+            const valorFormatado = typeof valor === 'string' ? `'${valor}'` : valor;
+            historicoCodigo.push(`<span style="color: #569cd6;">minha_lista</span>.<span style="color: #dcdcaa;">append</span>(${valorFormatado})`);
+
+            input.value = '';
+            atualizarInterface();
+        }
+
+        function executarInsert() {
+            const inputIndice = document.getElementById('indiceInsert');
+            const inputValor = document.getElementById('valorInsert');
+            const indice = parseInt(inputIndice.value);
+            let valor = inputValor.value.trim();
+
+            if (isNaN(indice) || indice < 0 || indice > minhaLista.length) {
+                return alert(`Índice inválido! O índice deve estar entre 0 e ${minhaLista.length}.`);
+            }
+            if (valor === '') {
+                return alert('Digite um valor para inserir!');
+            }
+
+            if (!isNaN(valor)) valor = Number(valor);
+
+            minhaLista.splice(indice, 0, valor);
+
+            const valorFormatado = typeof valor === 'string' ? `'${valor}'` : valor;
+            historicoCodigo.push(`<span style="color: #569cd6;">minha_lista</span>.<span style="color: #dcdcaa;">insert</span>(${indice}, ${valorFormatado})`);
+
+            inputIndice.value = '';
+            inputValor.value = '';
+            atualizarInterface();
+        }
+
+        function executarExtend() {
+            const input = document.getElementById('valoresExtend');
+            const entrada = input.value.trim();
+            if (entrada === '') return alert('Digite valores separados por vírgula!');
+
+            const novosValores = entrada.split(',').map(item => {
+                const limpo = item.trim();
+                return !isNaN(limpo) && limpo !== '' ? Number(limpo) : limpo;
+            });
+
+            minhaLista.push(...novosValores);
+
+            const listaFormatada = JSON.stringify(novosValores).replace(/"/g, "'");
+            historicoCodigo.push(`<span style="color: #569cd6;">minha_lista</span>.<span style="color: #dcdcaa;">extend</span>(${listaFormatada})`);
+
+            input.value = '';
+            atualizarInterface();
+        }
+
+        window.onload = function() {
+            criarLista();
+        };
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

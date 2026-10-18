@@ -6,30 +6,51 @@
     <title>Sistema para Apoio à Aprendizagem de Python - Login Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body class="bg-light d-flex align-items-center justify-content-center vh-100">
+<body class="bg-light">
 
-    <div class="card shadow-sm p-4" style="width: 100%; max-width: 420px;">
-        <div class="text-center mb-4">
-            <h4 class="fw-bold text-primary">Sistema para Apoio à Aprendizagem de Python</h4>
-            <small class="text-secondary d-block">Acesso Restrito ao Administrador</small>
+    <!-- Barra de navegação corrigida e posicionada no topo dentro do body -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary shadow-sm mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold text-primary" href="index.html">Login Admin <span class="text-muted fs-6 fw-normal d-none d-lg-inline">| Sistema para Apoio à Aprendizagem de Python</span></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                 <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Início</a></li>
+                    <li class="nav-item"><a class="nav-link" href="Banco-de-Questões.html">Banco de Questões</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="VisualizacaoListas.html">Simulador de Listas</a></li>
+                    <li class="nav-item"><a class="nav-link" href="admin.html">Painel Admin</a></li>
+                </ul>
+            </div>
         </div>
+    </nav>
 
-        <form id="formLogin">
-            <div class="mb-3">
-                <label for="email" class="form-label">E-mail</label>
-                <input type="email" id="email" class="form-control" required placeholder="admin@exemplo.com">
-            </div>
-            
-            <div class="mb-3">
-                <label for="senha" class="form-label">Senha</label>
-                <input type="password" id="senha" class="form-control" required placeholder="Sua senha de admin">
+    <!-- Container centralizado para o cartão de login -->
+    <div class="container d-flex align-items-center justify-content-center" style="min-height: 75vh;">
+        <div class="card shadow-sm p-4" style="width: 100%; max-width: 420px;">
+            <div class="text-center mb-4">
+                <h4 class="fw-bold text-primary">Sistema para Apoio à Aprendizagem de Python</h4>
+                <small class="text-secondary d-block">Acesso Restrito ao Administrador</small>
             </div>
 
-            <button type="submit" id="btnLogin" class="btn btn-primary w-100 mb-3">Entrar no Painel</button>
-            <a href="main.html" class="btn btn-outline-secondary w-100">Voltar ao site</a>
-        </form>
+            <form id="formLogin">
+                <div class="mb-3">
+                    <label for="email" class="form-label">E-mail</label>
+                    <input type="email" id="email" class="form-control" required placeholder="admin@exemplo.com">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="senha" class="form-label">Senha</label>
+                    <input type="password" id="senha" class="form-control" required placeholder="Sua senha de admin">
+                </div>
 
-        <div id="mensagemErro" class="mt-3"></div>
+                <button type="submit" id="btnLogin" class="btn btn-primary w-100 mb-3">Entrar no Painel</button>
+                <a href="index.html" class="btn btn-outline-secondary w-100">Voltar ao site</a>
+            </form>
+
+            <div id="mensagemErro" class="mt-3"></div>
+        </div>
     </div>
 
     <!-- SDK do Supabase -->
@@ -37,7 +58,7 @@
 
     <script>
         const SUPABASE_URL = 'https://rlcfttmkcnqpwzfrsimz.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsY2Z0dG1rY25xcHd6ZnJzaW16Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyOTU1NDMsImV4cCI6MjEwNTg3MTU0M30.wZoLzN8o12lCAU1te69Uc4W732dM30LG5OAjdBOGydo';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsY2Z0dG1rY25xcHd6ZnJzaW16Iiwicm9sZSI6InFub24iLCJpYXQiOjE3OTAyOTU1NDMsImV4cCI6MjEwNTg3MTU0M30.wZoLzN8o12lCAU1te69Uc4W732dM30LG5OAjdBOGydo';
 
         const meuSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 

@@ -17,9 +17,10 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="main.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.html">Início</a></li>
                     <li class="nav-item"><a class="nav-link" href="Banco-de-Questões.html">Banco de Questões</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="Admin.html">Painel Admin</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="VisualizacaoListas.html">Simulador de Listas</a></li>
+                    <li class="nav-item"><a class="nav-link" href="admin.html">Painel Admin</a></li>
                 </ul>
             </div>
         </div>
@@ -275,7 +276,7 @@
                         .eq('id', id);
 
                     if (error) throw error;
-                    alert('✅ Questão atualizada com sucesso!');
+                    alert(' Questão atualizada com sucesso!');
                 } else {
                     // Inserção (INSERT)
                     const { error } = await meuSupabase
@@ -283,7 +284,7 @@
                         .insert([dadosQuestao]);
 
                     if (error) throw error;
-                    alert('✅ Questão cadastrada com sucesso!');
+                    alert(' Questão cadastrada com sucesso!');
                 }
 
                 meuModal.hide();
@@ -291,7 +292,7 @@
 
             } catch (err) {
                 console.error(err);
-                alert(`❌ Erro ao salvar: ${err.message}`);
+                alert(` Erro ao salvar: ${err.message}`);
             } finally {
                 btn.textContent = 'Salvar Questão';
                 btn.disabled = false;
@@ -310,12 +311,12 @@
 
                 if (error) throw error;
 
-                alert('🗑️ Questão excluída com sucesso!');
+                alert(' Questão excluída com sucesso!');
                 carregarTabelaAdmin();
 
             } catch (err) {
                 console.error(err);
-                alert(`❌ Erro ao excluir: ${err.message}`);
+                alert(` Erro ao excluir: ${err.message}`);
             }
         }
     </script>
