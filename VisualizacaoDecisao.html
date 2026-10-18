@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sistema para Apoio à Aprendizagem de Python - Fluxograma Animado</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="VisualizacaoDecisao.html">
+
+</head>
+<body class="bg-light">
+
+    <!-- Barra de Navegação -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary shadow-sm mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold text-primary" href="index.html">
+                <span class="text-muted fs-6 fw-normal d-none d-lg-inline">| Sistema para Apoio à Aprendizagem de Python</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Início</a></li>
+                    <li class="nav-item"><a class="nav-link" href="Banco-de-Questões.html">Banco de Questões</a></li>
+                    <li class="nav-item"><a class="nav-link" href="VisualizacaoListas.html">Simulador de Listas</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="VisualizacaoDecisao.html">Simulador IF/ELSE</a></li>
+                    <li class="nav-item"><a class="nav-link" href="admin.html">Painel Admin</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-4">
+        <h2 class="fw-bold text-primary mb-1">Fluxograma Animado de Tomada de Decisão</h2>
+        <p class="text-muted mb-4">Acompanhe passo a passo a execução de cada desvio condicional no fluxograma.</p>
+
+        <div class="row g-4">
+            <!-- Coluna Esquerda: Construtor e Teste -->
+            <div class="col-lg-5">
+                
+                <div class="card shadow-sm mb-3">
+                    <div class="card-header bg-white fw-bold">1. Configurar Regras do Fluxograma</div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Nome da Variável:</label>
+                            <input type="text" id="nomeVariavel" class="form-control form-control-sm" value="valor">
+                        </div>
+
+                        <hr class="my-2">
+                        <label class="form-label small fw-semibold text-primary">Adicionar Condição (`if` / `elif`):</label>
+                        
+                        <div class="row g-2 mb-2">
+                            <div class="col-4">
+                                <select id="tipoCondicao" class="form-select form-select-sm">
+                                    <option value="if">if</option>
+                                    <option value="elif">elif</option>
+                                </select>
+                            </div>
+                            <div class="col-4">
+                                <select id="operadorCondicao" class="form-select form-select-sm">
+                                    <option value="&lt;">&lt;</option>
+                                    <option value="&lt;=">&lt;=</option>
+                                    <option value="&gt;">&gt;</option>
+                                    <option value="&gt;=">&gt;=</option>
+                                    <option value="==">==</option>
+                                </select>
+                            </div>
+                            <div class="col-4">
+                                <input type="number" id="valorCondicao" class="form-control form-control-sm" placeholder="Valor" value="10">
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <input type="text" id="acaoCondicao" class="form-control form-control-sm" placeholder="Ação se SIM" value="valor aceito">
+                        </div>
+
+                        <button class="btn btn-outline-primary btn-sm w-100 mb-3" onclick="adicionarCondicao()">+ Adicionar Bloco de Decisão</button>
+
+                        <div class="mb-2">
+                            <label class="form-label small fw-semibold">Ação Final (Bloco `else`):</label>
+                            <input type="text" id="acaoElse" class="form-control form-control-sm" value="valor recusado">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-3">
+                    <div class="card-header bg-white fw-bold">2. Rodar Simulação Passo a Passo</div>
+                    <div class="card-body">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="labelInputVar">valor =</span>
+                            <input type="number" id="valorTeste" class="form-control" value="5">
+                            <button id="btnRodar" class="btn btn-primary" onclick="executarAnimacaoPassoAPasso()">Iniciar Simulação</button>
+                        </div>
+                        <small class="text-muted">A execução simula o percurso visual com intervalo de tempo.</small>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-header bg-dark text-white fw-bold">Código Python Correspondente</div>
+                    <div class="card-body painel-codigo" id="painelCodigo">
+                        <p class="mb-0" style="color: #6a9955;"># O código aparecerá aqui</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coluna Direita: Fluxograma Visual Estilo Diagrama -->
+            <div class="col-lg-7">
+                <div class="card shadow-sm mb-3">
+                    <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center">
+                        <span>Diagrama de Fluxo (Passo a Passo)</span>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="resetarPadrao()">Restaurar Padrão</button>
+                    </div>
+                    <div class="card-body" id="containerFluxograma" style="max-height: 480px; overflow-y: auto;">
+                        <!-- Injetado via JS -->
+                    </div>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-header bg-dark text-white fw-bold">Saída do Terminal</div>
+                    <div class="card-body terminal-output" id="terminalOutput">
+                        <span class="text-muted">&gt;&gt; Aguardando início da simulação...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let regras = [
+            { tipo: 'if', op: '<', val: 10, acao: 'valor aceito' },
+            { tipo: 'elif', op: '<=', val: 20, acao: 'valor moderado' }
+        ];
+
+        let estadoAnimacao = {
+            passoAtual: -1,
+            ramificacaoAtiva: null
+        };
+
+        function adicionarCondicao() {
+            const tipo = document.getElementById('tipoCondicao').value;
+            const op = document.getElementById('operadorCondicao').value;
+            const val = parseFloat(document.getElementById('valorCondicao').value);
+            const acao = document.getElementById('acaoCondicao').value;
+
+            if (isNaN(val)) {
+                alert('Insira um valor numérico válido.');
+                return;
+            }
+
+            regras.push({ tipo, op, val, acao });
+            renderizarFluxograma();
+        }
+
+        function removerRegra(index) {
+            regras.splice(index, 1);
+            renderizarFluxograma();
+        }
+
+        function resetarPadrao() {
+            document.getElementById('nomeVariavel').value = 'valor';
+            document.getElementById('acaoElse').value = 'valor recusado';
+            regras = [
+                { tipo: 'if', op: '<', val: 10, acao: 'valor aceito' },
+                { tipo: 'elif', op: '<=', val: 20, acao: 'valor moderado' }
+            ];
+            estadoAnimacao = { passoAtual: -1, ramificacaoAtiva: null };
+            renderizarFluxograma();
+        }
+
+        function renderizarFluxograma() {
+            const container = document.getElementById('containerFluxograma');
+            const nomeVar = document.getElementById('nomeVariavel').value || 'valor';
+            const acaoElseText = document.getElementById('acaoElse').value;
+            
+            document.getElementById('labelInputVar').textContent = `${nomeVar} =`;
+            
+            let html = `<div class="text-center text-muted small mb-3">Início do Algoritmo</div>`;
+            
+            regras.forEach((regra, idx) => {
+                let ativoBloco = '';
+                let classeSim = '';
+                let classeNao = '';
+
+                if (estadoAnimacao.passoAtual === idx) {
+                    ativoBloco = 'ativo-atual';
+                    if (estadoAnimacao.ramificacaoAtiva === 'sim') classeSim = 'destacado-sim';
+                    if (estadoAnimacao.ramificacaoAtiva === 'nao') classeNao = 'destacado-nao';
+                }
+
+                html += `
+                    <div class="bloco-fluxograma ${ativoBloco}">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="badge bg-primary text-uppercase">${regra.tipo}</span>
+                            <button class="btn btn-sm btn-outline-danger py-0 px-1" onclick="removerRegra(${idx})" title="Remover">×</button>
+                        </div>
+                        
+                        <!-- Figura de Decisão (Losango) -->
+                        <div class="figura-losango">
+                            ${nomeVar} ${regra.op} ${regra.val} ?
+                        </div>
+
+                        <!-- Ramificações Sim / Não -->
+                        <div class="ramificacao-fluxo">
+                            <div class="caminho-opcao ${classeSim}">
+                                <strong>SIM</strong><br>
+                                <span class="small">print("${regra.acao}")</span>
+                            </div>
+                            <div class="caminho-opcao ${classeNao}">
+                                <strong>NÃO</strong><br>
+                                <span class="small">Próximo bloco</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="seta-fluxo">↓</div>
+                `;
+            });
+
+            // Bloco Final Else
+            let ativoElse = '';
+            if (estadoAnimacao.passoAtual === regras.length) {
+                ativoElse = 'ativo-atual';
+            }
+
+            html += `
+                <div class="bloco-fluxograma ${ativoElse}" style="border-style: dashed;">
+                    <div class="mb-2">
+                        <span class="badge bg-dark text-uppercase">else</span>
+                        <strong class="ms-1 small">Condição Padrão</strong>
+                    </div>
+                    <div class="figura-retangulo">
+                        print("${acaoElseText}")
+                    </div>
+                </div>
+                <div class="text-center text-muted small mt-2">Fim</div>
+            `;
+
+            container.innerHTML = html;
+            atualizarCodigoPython();
+        }
+
+        function atualizarCodigoPython() {
+            const nomeVar = document.getElementById('nomeVariavel').value || 'valor';
+            const acaoElseText = document.getElementById('acaoElse').value;
+            const painel = document.getElementById('painelCodigo');
+
+            let codigo = `${nomeVar} = valor_teste<br><br>`;
+            
+            regras.forEach((regra) => {
+                codigo += `<span style="color: #569cd6;">${regra.tipo}</span> ${nomeVar} ${regra.op} ${regra.val}:<br>`;
+                codigo += `&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #dcdcaa;">print</span>("${regra.acao}")<br>`;
+            });
+
+            codigo += `<span style="color: #569cd6;">else</span>:<br>`;
+            codigo += `&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #dcdcaa;">print</span>("${acaoElseText}")`;
+
+            painel.innerHTML = codigo;
+        }
+
+        function esperar(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function executarAnimacaoPassoAPasso() {
+            const nomeVar = document.getElementById('nomeVariavel').value || 'valor';
+            const valorTeste = parseFloat(document.getElementById('valorTeste').value);
+            const acaoElseText = document.getElementById('acaoElse').value;
+            const terminal = document.getElementById('terminalOutput');
+            const btnRodar = document.getElementById('btnRodar');
+
+            if (isNaN(valorTeste)) {
+                alert('Insira um número válido para testar.');
+                return;
+            }
+
+            btnRodar.disabled = true;
+            terminal.innerHTML = `&gt;&gt; Iniciando análise passo a passo com ${nomeVar} = ${valorTeste}...`;
+
+            let indiceEncontrado = -1;
+            let acaoFinal = "";
+
+            for (let i = 0; i < regras.length; i++) {
+                const r = regras[i];
+                
+                estadoAnimacao = { passoAtual: i, ramificacaoAtiva: null };
+                renderizarFluxograma();
+                terminal.innerHTML = `&gt;&gt; Passo ${i+1}: Testando se ${nomeVar} (${valorTeste}) ${r.op} ${r.val}...`;
+                await esperar(2000);
+
+                let atende = false;
+                switch(r.op) {
+                    case '<': atende = valorTeste < r.val; break;
+                    case '<=': atende = valorTeste <= r.val; break;
+                    case '>': atende = valorTeste > r.val; break;
+                    case '>=': atende = valorTeste >= r.val; break;
+                    case '==': atende = valorTeste === r.val; break;
+                }
+
+                if (atende) {
+                    estadoAnimacao = { passoAtual: i, ramificacaoAtiva: 'sim' };
+                    renderizarFluxograma();
+                    terminal.innerHTML = `&gt;&gt; Condição <strong>SIM</strong> atendida no passo ${i+1}!<br>&gt;&gt; <span class="text-success fw-bold">${r.acao}</span>`;
+                    indiceEncontrado = i;
+                    acaoFinal = r.acao;
+                    break;
+                } else {
+                    estadoAnimacao = { passoAtual: i, ramificacaoAtiva: 'nao' };
+                    renderizarFluxograma();
+                    terminal.innerHTML = `&gt;&gt; Condição <strong>NÃO</strong> atendida. Descendo para o próximo bloco...`;
+                    await esperar(1500);
+                }
+            }
+
+            if (indiceEncontrado === -1) {
+                estadoAnimacao = { passoAtual: regras.length, ramificacaoAtiva: null };
+                renderizarFluxograma();
+                await esperar(1500);
+                acaoFinal = acaoElseText;
+                terminal.innerHTML = `&gt;&gt; Nenhuma condição anterior foi satisfeita. Acionando bloco <strong>else</strong> padrão:<br>&gt;&gt; <span class="text-warning fw-bold">${acaoFinal}</span>`;
+            }
+
+            btnRodar.disabled = false;
+        }
+
+        window.onload = function() {
+            renderizarFluxograma();
+        };
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
